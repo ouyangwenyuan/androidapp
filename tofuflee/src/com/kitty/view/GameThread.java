@@ -16,6 +16,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -31,7 +32,7 @@ import com.kitty.utils.MediaPlayerUtil;
 
 public class GameThread extends Thread {
     // 游戏线程每执行一次需要睡眠的时间
-    private final static int DELAY_TIME = 100;
+    private final static int DELAY_TIME = 50;
     // 上下文，方便获取到应用的各项资源，如图片、音乐和字符串
     private Context context;
     // 与Activity其他view交互用的handler
@@ -45,13 +46,13 @@ public class GameThread extends Thread {
     // 游戏是否暂停
     private boolean isPaused = false;
     // 感应器
-    private SensorManager sensorManager;
+    // private SensorManager sensorManager;
     // 是否注册了传感器
-    private boolean registeredSensor;
+    // private boolean registeredSensor;
     // 最小偏移量
     private float SENSOR_CHANGE_DIRECTION_VALUE = 0.0f;
     // 奶牛
-    private Tofu cow;
+    private Tofu tofu;
     // 帧数
     private int frame;
     private int curHeight;
@@ -62,7 +63,7 @@ public class GameThread extends Thread {
     //开始按钮区域
     public Rect startButtonRect = new Rect();
     //启动状态
-    private Object starState;
+    private String starState;
     // 初始化
     public static final int GS_INIT = 0;
     // 死亡
@@ -131,7 +132,7 @@ public class GameThread extends Thread {
         // 如果游戏中存在时间，需要将其在此调整到正常
         synchronized (surfaceHolder) {
             isPaused = false;
-            mpu.unPause();
+            mpu.resume();
         }
     }
 
@@ -145,7 +146,7 @@ public class GameThread extends Thread {
     }
 
     /**
-     * 在Activity切至后天时保存游戏
+     * 在Activity切至后台时保存游戏
      * 
      * @param outState 保存游戏数据的容器
      */
@@ -168,8 +169,8 @@ public class GameThread extends Thread {
      */
     public boolean doKeyDown(int keyCode, KeyEvent event) {
         synchronized (surfaceHolder) {
-            if (cow != null)
-                cow.doKeyDown(keyCode, event);
+            if (tofu != null)
+                tofu.doKeyDown(keyCode, event);
             return false;
         }
     }
@@ -251,7 +252,7 @@ public class GameThread extends Thread {
                 }
                 //实例化一个地图和一个奶牛对象
                 gameMap = new GameMap();
-                cow = new Tofu(this);
+                tofu = new Tofu(this);
                 //初始化奶牛参数
                 initCowParams();
                 //初始化图片
@@ -267,12 +268,12 @@ public class GameThread extends Thread {
             case GS_START:
                 //地图中的物体移动
                 gameMap.move();
-                if (null != cow) {
+                if (null != tofu) {
                     //奶牛移动
-                    cow.move();
+                    tofu.move();
                 }
-                if (null != cow) {
-                    cow.collideWidthMapObject();
+                if (null != tofu) {
+                    tofu.collideWidthMapObject();
                 }
                 break;
             //死亡
@@ -292,9 +293,9 @@ public class GameThread extends Thread {
         Tofu.jumpHeightHigh = screenHeight / 2;
 
         // 初始化奶牛坐标
-        cow.setX(screenWidth / 2 - ImageManager.getInstance().bitmapRightCow0.getWidth() / 2);
-        cow.setY(ImageManager.getInstance().bitmapRightCow0.getHeight());
-        cow.setJumpStartY(0);
+        tofu.setX(screenWidth / 2 - ImageManager.getInstance().bitmapRightCow0.getWidth() / 2);
+        tofu.setY(ImageManager.getInstance().bitmapRightCow0.getHeight());
+        tofu.setJumpStartY(0);
     }
 
     /**
@@ -346,8 +347,8 @@ public class GameThread extends Thread {
             drawCurheight(canvas, paint);
 
             // 画奶牛
-            if (cow != null) {
-                cow.draw(canvas, paint, frame);
+            if (tofu != null) {
+                tofu.draw(canvas, paint, frame);
             }
 
             switch (gameState) {
@@ -409,16 +410,16 @@ public class GameThread extends Thread {
             // 获取X轴上的重力加速度
             float sensorValueX = event.values[SensorManager.DATA_X];
             Log.i(getName(), "sensorValueX =" + sensorValueX + ",SENSOR_CHANGE_DIRECTION_VALUE =" + SENSOR_CHANGE_DIRECTION_VALUE);
-            if (null != cow) {
+            if (null != tofu) {
                 if (sensorValueX > SENSOR_CHANGE_DIRECTION_VALUE) {
                     // 奶牛方向向左
-                    cow.changDirectionLeft(sensorValueX);
+                    tofu.changDirectionLeft(sensorValueX);
                 } else if (sensorValueX < SENSOR_CHANGE_DIRECTION_VALUE) {
                     // 奶牛方向向右
-                    cow.changDirectionRight(-sensorValueX);
+                    tofu.changDirectionRight(-sensorValueX);
                 } else {
                     // 奶牛方向不变
-                    cow.stopChangDirection();
+                    tofu.stopChangDirection();
                 }
             }
         }
@@ -439,7 +440,7 @@ public class GameThread extends Thread {
                         @Override
                         public void run() {
                             gameState = GS_START;
-                            cow.setMove(true);
+                            tofu.setMove(true);
                             hasPressedStart = false;
                             mpu.play();
                         }
@@ -447,12 +448,12 @@ public class GameThread extends Thread {
                 }
                 break;
             case GS_START:
-                if (x < cow.getX()) {
-                    cow.changDirectionLeft(0.1f);
-                } else if (x > cow.getX() + cow.getBitmapWidth()) {
-                    cow.changDirectionRight(-0.1f);
+                if (x < tofu.getX()) {
+                    tofu.changDirectionLeft(0.1f);
+                } else if (x > tofu.getX() + tofu.getBitmapWidth()) {
+                    tofu.changDirectionRight(-0.1f);
                 } else {
-                    cow.stopChangDirection();
+                    tofu.stopChangDirection();
                 }
                 break;
         }
@@ -464,6 +465,11 @@ public class GameThread extends Thread {
     public void gameWin() {
         gameState = GS_OVER;
         starState = context.getString(R.string.gamewin);
+        Message msg = new Message();
+        Bundle bundle = new Bundle();
+        bundle.putString("text", starState);
+        msg.setData(bundle);
+        handler.sendMessage(msg);
         mpu.stop();
         new Timer().schedule(new TimerTask() {
 
@@ -478,14 +484,20 @@ public class GameThread extends Thread {
      * 游戏失败
      */
     public void gameOver() {
+
         gameState = GS_OVER;
         starState = context.getString(R.string.gameover);
+        Message msg = new Message();
+        Bundle bundle = new Bundle();
+        bundle.putString("text", starState);
+        msg.setData(bundle);
+        handler.sendMessage(msg);
         mpu.stop();
         new Timer().schedule(new TimerTask() {
 
             @Override
             public void run() {
-                cow = null;
+                tofu = null;
                 gameState = GS_INIT;
             }
         }, 3000);
@@ -506,16 +518,21 @@ public class GameThread extends Thread {
      */
     public void moveMap(int cowOldY, int cowY) {
         // 当奶牛的当前高度已超过终点高度时，不移动地图
-        if (cowY - cow.getBitmapHeight() >= GameMap.MAX_HEIGHT) {
+        if (cowY - tofu.getBitmapHeight() >= GameMap.MAX_HEIGHT) {
+            //TODO 
             return;
         }
         // 当奶牛跳过半屏高度时移动地图
-        if (cowY - gameMap.getCurBottom() > screenHeight / 2) {
+        if (cowY - gameMap.getCurBottom() > screenHeight * 2 / 3) {
             gameMap.setCurBottom(gameMap.getCurBottom() + cowY - cowOldY);
             if (gameMap.getCurBottom() > (gameMap.getInitialScreenNum() - 1) * screenHeight) {
                 gameMap.initData();
             }
         }
+    }
+
+    public void backStartMap() {
+
     }
 
     public void addCrumbleAnimation(int i, int tempY) {

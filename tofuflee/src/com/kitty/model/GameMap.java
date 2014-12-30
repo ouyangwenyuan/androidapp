@@ -17,20 +17,20 @@ import com.kitty.view.GameThread;
  */
 public class GameMap {
 
-    private final static String TAG = "GameMap";
+    private final static String TAG = GameMap.class.getSimpleName();
     // 终点踏板的高度
     public final static int MAX_HEIGHT = 30000;
     // 每两层踏板之间的最小间隔
     private final static int LINE_HEIGHT = 40;
-    // 每屏中炸弹最大数量
+    // 每屏中shit最大数量
     private final static int MAX_BOME_NUM = 1;
     // 每屏中弹簧踏板的最大数量
-    private final static int MAX_TRAMPPAS_NUM = 1;
+    private final static int MAX_TRAMPPAS_NUM = 2;
     // 每屏中礼物盒的最大数量
     private final static int MAX_PRESENT_NUM = 2;
     // 每屏中黑洞的最大数量
     private final static int MAX_AST_NUM = 1;
-    // 已产生炸弹的数量
+    // 已产生shit的数量
     private int bombNum = 0;
     // 已产生的弹簧踏板的数量
     private int trampPasNum = 0;
@@ -139,7 +139,7 @@ public class GameMap {
     private void initNums() {
         // 黑洞数量
         this.astNum = 0;
-        // 炸弹的数量
+        // shit的数量
         this.bombNum = 0;
         // 礼物盒的数量
         this.presentNum = 0;
@@ -148,7 +148,7 @@ public class GameMap {
     }
 
     /**
-     * 根据出现位置的高度产生随机的地图物体集合，包括炸弹、黑洞、礼物盒、踏板
+     * 根据出现位置的高度产生随机的地图物体集合，包括shit、黑洞、礼物盒、踏板
      * 
      * @param height 出现位置的高度
      * @return 产生的地图物体
@@ -175,7 +175,7 @@ public class GameMap {
         if (present != null) {
             objList.add(present);
         }
-        // 炸弹
+        // shit
         MapObject bomb = createBomb(height);
         if (bomb != null) {
             objList.add(bomb);
@@ -184,7 +184,7 @@ public class GameMap {
     }
 
     /**
-     * 创建炸弹
+     * 创建shit
      * 
      * @param paramInt
      * @return

@@ -61,7 +61,7 @@ public class MediaPlayerUtil {
 	/**
 	 * 
 	 */
-	public void unPause(){
+	public void resume(){
 		if(mp==null){
 			return ;
 		}
