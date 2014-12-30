@@ -21,9 +21,9 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
-import com.kitty.tofuflee.R;
-import com.kitty.model.Tofu;
 import com.kitty.model.GameMap;
+import com.kitty.model.Tofu;
+import com.kitty.tofuflee.R;
 import com.kitty.utils.AudioUtil;
 import com.kitty.utils.CrumbleAnimation;
 import com.kitty.utils.ImageManager;
@@ -312,8 +312,8 @@ public class GameThread extends Thread {
      */
     public void initBgBitmap() {
         // 彩旗
-        ImageManager.getInstance().bitmapFlag = Bitmap.createScaledBitmap(ImageManager.getInstance().bitmapFlag, screenWidth, ImageManager.getInstance().bitmapFlag.getHeight(),
-                false);
+        //        ImageManager.getInstance().bitmapFlag = Bitmap.createScaledBitmap(ImageManager.getInstance().bitmapFlag, screenWidth, ImageManager.getInstance().bitmapFlag.getHeight(),
+        //                false);
         // 蓝天
         ImageManager.getInstance().bitmapWaterbg = Bitmap.createScaledBitmap(ImageManager.getInstance().bitmapWaterbg, screenWidth, screenHeight, false);
     }
@@ -396,7 +396,7 @@ public class GameThread extends Thread {
      */
     public void drawCurheight(Canvas canvas, Paint paint) {
         canvas.drawBitmap(ImageManager.getInstance().bitmapUp, 0, 0, paint);
-        ImageManager.getInstance().drawNum(curHeight, canvas, paint, ImageManager.getInstance().bitmapUp.getWidth(), 0);
+        ImageManager.getInstance().drawNum(curHeight, canvas, paint, ImageManager.getInstance().bitmapUp.getWidth(), 20);
     }
 
     /**

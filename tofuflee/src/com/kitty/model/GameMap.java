@@ -318,7 +318,7 @@ public class GameMap {
         if (20 + curBottom >= GameThread.screenHeight) {
             return;
         }
-        canvas.drawBitmap(ImageManager.getInstance().bitmapFlag, 0, 20 + curBottom, paint);
+        // canvas.drawBitmap(ImageManager.getInstance().bitmapFlag, 0, 20 + curBottom, paint);
     }
 
     /**
