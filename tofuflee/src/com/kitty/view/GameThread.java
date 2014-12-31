@@ -15,28 +15,38 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 
+import com.kitty.global.ImageManager;
 import com.kitty.model.GameMap;
 import com.kitty.model.Tofu;
 import com.kitty.tofuflee.R;
-import com.kitty.utils.AudioUtil;
 import com.kitty.utils.CrumbleAnimation;
-import com.kitty.utils.ImageManager;
 import com.kitty.utils.MediaPlayerUtil;
 
 public class GameThread extends Thread {
+
+    public interface GameStateChangeListener {
+        void onStateChanged(GameState gameState);
+    }
+
+    public enum GameState {
+        game_init,
+        game_ready,
+        game_start,
+        game_over;
+    }
+
+    private static GameThread instance;
     // 游戏线程每执行一次需要睡眠的时间
     private final static int DELAY_TIME = 50;
     // 上下文，方便获取到应用的各项资源，如图片、音乐和字符串
     private Context context;
     // 与Activity其他view交互用的handler
-    private Handler handler;
+    //private Handler handler;
     // 由SurfaceView提供的surfaceHoler
     private SurfaceHolder surfaceHolder;
     // 游戏线程运行开关
@@ -51,7 +61,7 @@ public class GameThread extends Thread {
     // private boolean registeredSensor;
     // 最小偏移量
     private float SENSOR_CHANGE_DIRECTION_VALUE = 0.0f;
-    // 奶牛
+    // tofu
     private Tofu tofu;
     // 帧数
     private int frame;
@@ -73,9 +83,9 @@ public class GameThread extends Thread {
     // 启动
     public static final int GS_START = 2;
     //音效处理类
-    private AudioUtil au;
+    // private AudioUtil au;
     //
-    private CrumbleAnimation ca;
+    private CrumbleAnimation breakAnim;
     //地图类
     private GameMap gameMap;
     //音乐处理类
@@ -86,13 +96,19 @@ public class GameThread extends Thread {
     private boolean hasPressedStart;
 
     // 构造方法
-    public GameThread(Context context, SurfaceHolder holder, Handler handler) {
+    public GameThread(Context context, SurfaceHolder holder) {
         super();
+        // this.au = new AudioUtil(context);
+        // this.handler = handler;
         this.context = context;
-        this.handler = handler;
         this.surfaceHolder = holder;
-        this.au = new AudioUtil(context);
-        this.mpu = new MediaPlayerUtil(context, R.raw.abd_mus1);
+        this.mpu = MediaPlayerUtil.getMediaPlayerUtil();
+        mpu.setMediaRes(R.raw.abd_mus1);
+        instance = this;
+    }
+
+    public static GameThread getInstance() {
+        return instance;
     }
 
     /**
@@ -250,10 +266,10 @@ public class GameThread extends Thread {
                     initStartButtonRect();
                     hasInitFinish = true;
                 }
-                //实例化一个地图和一个奶牛对象
+                //实例化一个地图和一个tofu对象
                 gameMap = new GameMap();
-                tofu = new Tofu(this);
-                //初始化奶牛参数
+                tofu = new Tofu();
+                //初始化tofu参数
                 initCowParams();
                 //初始化图片
                 initBgBitmap();
@@ -269,7 +285,7 @@ public class GameThread extends Thread {
                 //地图中的物体移动
                 gameMap.move();
                 if (null != tofu) {
-                    //奶牛移动
+                    //tofu移动
                     tofu.move();
                 }
                 if (null != tofu) {
@@ -285,14 +301,14 @@ public class GameThread extends Thread {
     }
 
     /**
-     * 初始化奶牛参数
+     * 初始化tofu参数
      */
     private void initCowParams() {
-        // 初始化奶牛的跳跃高度
+        // 初始化tofu的跳跃高度
         Tofu.jumpHeightNormal = screenHeight / 3;
         Tofu.jumpHeightHigh = screenHeight / 2;
 
-        // 初始化奶牛坐标
+        // 初始化tofu坐标
         tofu.setX(screenWidth / 2 - ImageManager.getInstance().bitmapRightCow0.getWidth() / 2);
         tofu.setY(ImageManager.getInstance().bitmapRightCow0.getHeight());
         tofu.setJumpStartY(0);
@@ -346,7 +362,7 @@ public class GameThread extends Thread {
             // 绘制积分当前高度
             drawCurheight(canvas, paint);
 
-            // 画奶牛
+            // 画tofu
             if (tofu != null) {
                 tofu.draw(canvas, paint, frame);
             }
@@ -358,10 +374,10 @@ public class GameThread extends Thread {
                     break;
                 case GS_START:
                     // 画踩断踏板的动画
-                    if (null != ca) {
-                        ca.drawAnimation(canvas, paint, frame);
-                        if (ca.isHasDrawnFinished()) {
-                            ca = null;
+                    if (null != breakAnim) {
+                        breakAnim.drawAnimation(canvas, paint, frame);
+                        if (breakAnim.isHasDrawnFinished()) {
+                            breakAnim = null;
                         }
                     }
                     break;
@@ -401,24 +417,26 @@ public class GameThread extends Thread {
     }
 
     /**
-     * 处理感应器的变化 event 获取的sensor对象 cow 奶牛对象
+     * 处理感应器的变化 event 获取的sensor对象 cow tofu对象
      * 
      */
     public void doSensorChanged(SensorEvent event) {
         // 接受加速度传感器的类型
         if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             // 获取X轴上的重力加速度
+
             float sensorValueX = event.values[SensorManager.DATA_X];
-            Log.i(getName(), "sensorValueX =" + sensorValueX + ",SENSOR_CHANGE_DIRECTION_VALUE =" + SENSOR_CHANGE_DIRECTION_VALUE);
+
+            //Log.i(getName(), "sensorValueX =" + sensorValueX + ",SENSOR_CHANGE_DIRECTION_VALUE =" + SENSOR_CHANGE_DIRECTION_VALUE);
             if (null != tofu) {
                 if (sensorValueX > SENSOR_CHANGE_DIRECTION_VALUE) {
-                    // 奶牛方向向左
+                    // tofu方向向左
                     tofu.changDirectionLeft(sensorValueX);
                 } else if (sensorValueX < SENSOR_CHANGE_DIRECTION_VALUE) {
-                    // 奶牛方向向右
+                    // tofu方向向右
                     tofu.changDirectionRight(-sensorValueX);
                 } else {
-                    // 奶牛方向不变
+                    // tofu方向不变
                     tofu.stopChangDirection();
                 }
             }
@@ -469,7 +487,7 @@ public class GameThread extends Thread {
         Bundle bundle = new Bundle();
         bundle.putString("text", starState);
         msg.setData(bundle);
-        handler.sendMessage(msg);
+        //handler.sendMessage(msg);
         mpu.stop();
         new Timer().schedule(new TimerTask() {
 
@@ -486,12 +504,13 @@ public class GameThread extends Thread {
     public void gameOver() {
 
         gameState = GS_OVER;
+        //TODO show two button :cancel or replay
         starState = context.getString(R.string.gameover);
         Message msg = new Message();
         Bundle bundle = new Bundle();
         bundle.putString("text", starState);
         msg.setData(bundle);
-        handler.sendMessage(msg);
+        //handler.sendMessage(msg);
         mpu.stop();
         new Timer().schedule(new TimerTask() {
 
@@ -517,12 +536,12 @@ public class GameThread extends Thread {
      * @param y
      */
     public void moveMap(int cowOldY, int cowY) {
-        // 当奶牛的当前高度已超过终点高度时，不移动地图
+        // 当tofu的当前高度已超过终点高度时，不移动地图
         if (cowY - tofu.getBitmapHeight() >= GameMap.MAX_HEIGHT) {
             //TODO 
             return;
         }
-        // 当奶牛跳过半屏高度时移动地图
+        // 当tofu跳过半屏高度时移动地图
         if (cowY - gameMap.getCurBottom() > screenHeight * 2 / 3) {
             gameMap.setCurBottom(gameMap.getCurBottom() + cowY - cowOldY);
             if (gameMap.getCurBottom() > (gameMap.getInitialScreenNum() - 1) * screenHeight) {
@@ -536,7 +555,7 @@ public class GameThread extends Thread {
     }
 
     public void addCrumbleAnimation(int i, int tempY) {
-        ca = new CrumbleAnimation(frame, i, tempY);
+        breakAnim = new CrumbleAnimation(frame, i, tempY);
     }
 
     public int getFrame() {
@@ -547,9 +566,9 @@ public class GameThread extends Thread {
         this.frame = frame;
     }
 
-    public AudioUtil getAudioUtil() {
-        return this.au;
-    }
+    //    public AudioUtil getAudioUtil() {
+    //        return this.au;
+    //    }
 
     public GameMap getGameMap() {
         return this.gameMap;

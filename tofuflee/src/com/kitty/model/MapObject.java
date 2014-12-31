@@ -2,7 +2,7 @@ package com.kitty.model;
 
 import java.util.Random;
 
-import com.kitty.utils.ImageManager;
+import com.kitty.global.ImageManager;
 import com.kitty.view.GameThread;
 
 import android.graphics.Bitmap;

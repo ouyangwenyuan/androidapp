@@ -1,6 +1,6 @@
 package com.kitty.model;
 
-import com.kitty.utils.ImageManager;
+import com.kitty.global.ImageManager;
 import com.kitty.view.GameThread;
 
 import android.graphics.Bitmap;

@@ -1,4 +1,4 @@
-package com.kitty.utils;
+package com.kitty.global;
 
 import java.util.ArrayList;
 

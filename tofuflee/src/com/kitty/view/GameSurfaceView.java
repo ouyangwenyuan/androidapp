@@ -1,8 +1,6 @@
 package com.kitty.view;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -18,8 +16,6 @@ import android.view.SurfaceView;
  */
 public class GameSurfaceView extends SurfaceView implements Callback {
     private GameThread gameThread;
-
-    //private TextView textView;
 
     public GameSurfaceView(Context context) {
         super(context);
@@ -40,12 +36,7 @@ public class GameSurfaceView extends SurfaceView implements Callback {
     private void init(Context context) {
         SurfaceHolder holder = getHolder();
         holder.addCallback(this);
-        gameThread = new GameThread(context, holder, new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                //textView.setText(msg.getData().getString("text"));
-            }
-        });
+        gameThread = new GameThread(context, holder);
         // 设置可获得焦点，确保能捕获到keyCode
         setFocusable(true);
     }

@@ -6,7 +6,7 @@ import java.util.Random;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
-import com.kitty.utils.ImageManager;
+import com.kitty.global.ImageManager;
 import com.kitty.view.GameThread;
 
 /**

@@ -1,4 +1,4 @@
-package com.kitty.view;
+package com.kitty.control;
 
 import java.util.List;
 
@@ -17,8 +17,12 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import com.kitty.utils.FJLog;
+import com.kitty.view.GameSurfaceView;
+import com.kitty.view.GameThread;
+
 public class GameActivity extends Activity implements SensorEventListener {
-    private GameSurfaceView gameSurfaceView;
+    // private GameSurfaceView gameSurfaceView;
     private GameThread gameThread;
     private boolean registeredSensor;
     private SensorManager sensorManager;
@@ -39,7 +43,7 @@ public class GameActivity extends Activity implements SensorEventListener {
         //        gameSurfaceView = (GameSurfaceView) this.findViewById(R.id.gameview);
         //        gameSurfaceView.setTextView((TextView) findViewById(R.id.textview));
         // 取得sensorManager的实例
-        gameSurfaceView = new GameSurfaceView(this);
+        GameSurfaceView gameSurfaceView = new GameSurfaceView(this);
         setContentView(gameSurfaceView);
 
         gameThread = gameSurfaceView.getThread();
@@ -72,7 +76,7 @@ public class GameActivity extends Activity implements SensorEventListener {
     @Override
     protected void onPause() {
         super.onPause();
-        gameSurfaceView.getThread().pause();
+        gameThread.pause();
         if (!(registeredSensor)) {
             return;
         }
@@ -89,7 +93,7 @@ public class GameActivity extends Activity implements SensorEventListener {
         super.onResume();
 
         // 游戏结束暂停状态，游戏正常进行
-        gameSurfaceView.getThread().unPause();
+        gameThread.unPause();
 
         List<Sensor> accelerometerSensors = sensorManager.getSensorList(Sensor.TYPE_ACCELEROMETER);
         if (accelerometerSensors.size() > 0) {
@@ -97,10 +101,65 @@ public class GameActivity extends Activity implements SensorEventListener {
             Sensor sensor = accelerometerSensors.get(0);
             // 注册sensorManager
             registeredSensor = sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+        } else {
+            FJLog.l("no sensor");
         }
-
-        gameSurfaceView.getThread().unPause();
+        testSensor();
+        gameThread.unPause();
         this.wakeLock.acquire();
+    }
+
+    private void testSensor() {
+        //从传感器管理器中获得全部的传感器列表   
+        List<Sensor> allSensors = sensorManager.getSensorList(Sensor.TYPE_ALL);
+
+        //显示有多少个传感器   
+        FJLog.l("经检测该手机有" + allSensors.size() + "个传感器，他们分别是：\n");
+
+        //显示每个传感器的具体信息   
+        for (Sensor s : allSensors) {
+
+            String tempString = "\n" + "  设备名称：" + s.getName() + "\n" + "  设备版本：" + s.getVersion() + "\n" + "  供应商：" + s.getVendor() + "\n";
+
+            switch (s.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    FJLog.l(s.getType() + " 加速度传感器accelerometer" + tempString);
+                    break;
+                case Sensor.TYPE_GYROSCOPE:
+                    FJLog.l(s.getType() + " 陀螺仪传感器gyroscope" + tempString);
+                    break;
+                case Sensor.TYPE_LIGHT:
+                    FJLog.l(s.getType() + " 环境光线传感器light" + tempString);
+                    break;
+                case Sensor.TYPE_MAGNETIC_FIELD:
+                    FJLog.l(s.getType() + " 电磁场传感器magnetic field" + tempString);
+                    break;
+                case Sensor.TYPE_ORIENTATION:
+                    FJLog.l(s.getType() + " 方向传感器orientation" + tempString);
+                    break;
+                case Sensor.TYPE_PRESSURE:
+                    FJLog.l(s.getType() + " 压力传感器pressure" + tempString);
+                    break;
+                case Sensor.TYPE_PROXIMITY:
+                    FJLog.l(s.getType() + " 距离传感器proximity" + tempString);
+                    break;
+                case Sensor.TYPE_TEMPERATURE:
+                    FJLog.l(s.getType() + " 温度传感器temperature" + tempString);
+                    break;
+                case Sensor.TYPE_GRAVITY:
+                    FJLog.l(s.getType() + " 重力传感器temperature" + tempString);
+                    break;
+                case Sensor.TYPE_LINEAR_ACCELERATION:
+                    FJLog.l(s.getType() + " 线性加速传感器temperature" + tempString);
+                    break;
+                case Sensor.TYPE_ROTATION_VECTOR:
+                    FJLog.l(s.getType() + " 旋转矢量传感器temperature" + tempString);
+                    break;
+                default:
+                    FJLog.l(s.getType() + " 未知传感器" + tempString);
+                    break;
+            }
+        }
     }
 
     /**
@@ -155,6 +214,7 @@ public class GameActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        FJLog.l("SensorEvent x=" + event.values[SensorManager.DATA_X] + ",y=" + event.values[SensorManager.DATA_Y] + ",z=" + event.values[SensorManager.DATA_Z]);
         if (gameThread == null) {
             return;
         }
