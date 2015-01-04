@@ -8,7 +8,7 @@ import android.graphics.Paint;
 
 public class CrumbleAnimation {
 	// 动画持续时间
-	private final static int DURATION = 4;
+	private final static int DURATION = 300;
 	private int startFrame;
 	// 动画对应的原踏板上边缘中点的X坐标
 	private int centerX;

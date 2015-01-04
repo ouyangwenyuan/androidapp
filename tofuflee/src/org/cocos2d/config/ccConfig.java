@@ -33,7 +33,7 @@ public class ccConfig {
 
       To enable set it to a value different than 0. Enabled by default.
       */
-    public static final boolean CC_DIRECTOR_FAST_FPS    =	true;
+    public static final boolean CC_DIRECTOR_FAST_FPS    =	false;
 
     /** @def CC_DIRECTOR_FPS_INTERVAL
       Senconds between FPS updates.

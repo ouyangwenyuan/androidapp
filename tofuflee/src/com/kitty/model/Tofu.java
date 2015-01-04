@@ -36,7 +36,7 @@ public class Tofu {
     // 碰撞地图物体结果：游戏胜利
     private final static int COLLIDE_RESULT_WIN = 2;
     // 垂直方向移动速度：普通
-    private static int MOVE_SPEED_VER_NORMAL = 20;
+    private static int MOVE_SPEED_VER_NORMAL = 80;
     // 垂直方向移动速度：缓慢
     private static int MOVE_SPEED_VER_SLOW = MOVE_SPEED_VER_NORMAL / 2;
     // 水平方向移动速度
