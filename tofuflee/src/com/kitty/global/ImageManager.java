@@ -33,7 +33,7 @@ public class ImageManager {
     public Bitmap bitmapBonusHighjump;
     public Bitmap bitmapBonusSlow;
     public Bitmap bitmapBonusSlowLogo;
-    public Bitmap[] bitmapChars;
+    //public Bitmap[] bitmapChars;
     //public Bitmap bitmapFlag;
     public Bitmap bitmapLeftCow0;
     public Bitmap bitmapLeftCow1;
@@ -98,49 +98,49 @@ public class ImageManager {
      * @param centerX
      * @param y
      */
-    public void drawString(String paramString, Canvas canvas, Paint paint, int centerX, int y) {
-        // 将所有在此字符串中的字符小写的规则给定的Locale.
-        String tempStr = paramString.toLowerCase();
-        // 如果字符串不全是由字母和空格组成，则不画
-        if (!tempStr.matches("[a-z\\s]+")) {
-            return;
-        }
-        // 组成字符串的所有字符串
-        char[] chs = tempStr.toCharArray();
-        // 所有字符对应的图片数组的索引
-        int[] indexs = new int[chs.length];
-        // 所有字符串对应的宽度
-        int[] widths = new int[chs.length];
-        // 所有字符的总宽度
-        int sumWidth = 0;
-        // 定义空格的宽度
-        int blankWidth = 20;
-
-        // 计算索引及宽度
-        for (int i = 0; i < chs.length; i++) {
-            if (chs[i] == ' ') {
-                widths[i] = blankWidth;
-            } else {
-                indexs[i] = chs[i] - 'a';
-                widths[i] = bitmapChars[indexs[i]].getWidth();
-            }
-            sumWidth += widths[i];
-        }
-        // 定义画出来的字符串宽度为：每个字符宽度-2后再相加的结果
-        int overlayWidth = 4;
-        int drawWidth = sumWidth - overlayWidth * chs.length;
-        // 结尾字符的右边缘X坐标
-        int endX = centerX + drawWidth / 2;
-        // 倒着画，造成后面的字母被前面的字母压住的效果
-        for (int i = chs.length - 1; i >= 0; i--) {
-            if (chs[i] != ' ') {
-                //				canvas.drawBitmap(bitmapChars[indexs[i]], endX - widths[i],
-                //						paint);
-            }
-            endX -= widths[i] - overlayWidth;
-        }
-
-    }
+//    public void drawString(String paramString, Canvas canvas, Paint paint, int centerX, int y) {
+//        // 将所有在此字符串中的字符小写的规则给定的Locale.
+//        String tempStr = paramString.toLowerCase();
+//        // 如果字符串不全是由字母和空格组成，则不画
+//        if (!tempStr.matches("[a-z\\s]+")) {
+//            return;
+//        }
+//        // 组成字符串的所有字符串
+//        char[] chs = tempStr.toCharArray();
+//        // 所有字符对应的图片数组的索引
+//        int[] indexs = new int[chs.length];
+//        // 所有字符串对应的宽度
+//        int[] widths = new int[chs.length];
+//        // 所有字符的总宽度
+//        int sumWidth = 0;
+//        // 定义空格的宽度
+//        int blankWidth = 20;
+//
+//        // 计算索引及宽度
+//        for (int i = 0; i < chs.length; i++) {
+//            if (chs[i] == ' ') {
+//                widths[i] = blankWidth;
+//            } else {
+//                indexs[i] = chs[i] - 'a';
+//                widths[i] = bitmapChars[indexs[i]].getWidth();
+//            }
+//            sumWidth += widths[i];
+//        }
+//        // 定义画出来的字符串宽度为：每个字符宽度-2后再相加的结果
+//        int overlayWidth = 4;
+//        int drawWidth = sumWidth - overlayWidth * chs.length;
+//        // 结尾字符的右边缘X坐标
+//        int endX = centerX + drawWidth / 2;
+//        // 倒着画，造成后面的字母被前面的字母压住的效果
+//        for (int i = chs.length - 1; i >= 0; i--) {
+//            if (chs[i] != ' ') {
+//                //				canvas.drawBitmap(bitmapChars[indexs[i]], endX - widths[i],
+//                //						paint);
+//            }
+//            endX -= widths[i] - overlayWidth;
+//        }
+//
+//    }
 
     /**
      * 加载游戏中所有图片
@@ -171,33 +171,33 @@ public class ImageManager {
         bitmapUp = BitmapFactory.decodeResource(context.getResources(), R.drawable.shit);
         bitmapStart0 = BitmapFactory.decodeResource(context.getResources(), R.drawable.start);
         bitmapStart1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.start_s);
-        bitmapChars = new Bitmap[26];
-        bitmapChars[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.a);
-        bitmapChars[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.b);
-        bitmapChars[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.c);
-        bitmapChars[3] = BitmapFactory.decodeResource(context.getResources(), R.drawable.d);
-        bitmapChars[4] = BitmapFactory.decodeResource(context.getResources(), R.drawable.e);
-        bitmapChars[5] = BitmapFactory.decodeResource(context.getResources(), R.drawable.f);
-        bitmapChars[6] = BitmapFactory.decodeResource(context.getResources(), R.drawable.g);
-        bitmapChars[7] = BitmapFactory.decodeResource(context.getResources(), R.drawable.h);
-        bitmapChars[8] = BitmapFactory.decodeResource(context.getResources(), R.drawable.i);
-        bitmapChars[9] = BitmapFactory.decodeResource(context.getResources(), R.drawable.j);
-        bitmapChars[10] = BitmapFactory.decodeResource(context.getResources(), R.drawable.k);
-        bitmapChars[11] = BitmapFactory.decodeResource(context.getResources(), R.drawable.l);
-        bitmapChars[12] = BitmapFactory.decodeResource(context.getResources(), R.drawable.m);
-        bitmapChars[13] = BitmapFactory.decodeResource(context.getResources(), R.drawable.n);
-        bitmapChars[14] = BitmapFactory.decodeResource(context.getResources(), R.drawable.o);
-        bitmapChars[15] = BitmapFactory.decodeResource(context.getResources(), R.drawable.p);
-        bitmapChars[16] = BitmapFactory.decodeResource(context.getResources(), R.drawable.q);
-        bitmapChars[17] = BitmapFactory.decodeResource(context.getResources(), R.drawable.r);
-        bitmapChars[18] = BitmapFactory.decodeResource(context.getResources(), R.drawable.s);
-        bitmapChars[19] = BitmapFactory.decodeResource(context.getResources(), R.drawable.t);
-        bitmapChars[20] = BitmapFactory.decodeResource(context.getResources(), R.drawable.u);
-        bitmapChars[21] = BitmapFactory.decodeResource(context.getResources(), R.drawable.v);
-        bitmapChars[22] = BitmapFactory.decodeResource(context.getResources(), R.drawable.w);
-        bitmapChars[23] = BitmapFactory.decodeResource(context.getResources(), R.drawable.x);
-        bitmapChars[24] = BitmapFactory.decodeResource(context.getResources(), R.drawable.y);
-        bitmapChars[25] = BitmapFactory.decodeResource(context.getResources(), R.drawable.z);
+       // bitmapChars = new Bitmap[26];
+//        bitmapChars[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.a);
+//        bitmapChars[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.b);
+//        bitmapChars[2] = BitmapFactory.decodeResource(context.getResources(), R.drawable.c);
+//        bitmapChars[3] = BitmapFactory.decodeResource(context.getResources(), R.drawable.d);
+//        bitmapChars[4] = BitmapFactory.decodeResource(context.getResources(), R.drawable.e);
+//        bitmapChars[5] = BitmapFactory.decodeResource(context.getResources(), R.drawable.f);
+//        bitmapChars[6] = BitmapFactory.decodeResource(context.getResources(), R.drawable.g);
+//        bitmapChars[7] = BitmapFactory.decodeResource(context.getResources(), R.drawable.h);
+//        bitmapChars[8] = BitmapFactory.decodeResource(context.getResources(), R.drawable.i);
+//        bitmapChars[9] = BitmapFactory.decodeResource(context.getResources(), R.drawable.j);
+//        bitmapChars[10] = BitmapFactory.decodeResource(context.getResources(), R.drawable.k);
+//        bitmapChars[11] = BitmapFactory.decodeResource(context.getResources(), R.drawable.l);
+//        bitmapChars[12] = BitmapFactory.decodeResource(context.getResources(), R.drawable.m);
+//        bitmapChars[13] = BitmapFactory.decodeResource(context.getResources(), R.drawable.n);
+//        bitmapChars[14] = BitmapFactory.decodeResource(context.getResources(), R.drawable.o);
+//        bitmapChars[15] = BitmapFactory.decodeResource(context.getResources(), R.drawable.p);
+//        bitmapChars[16] = BitmapFactory.decodeResource(context.getResources(), R.drawable.q);
+//        bitmapChars[17] = BitmapFactory.decodeResource(context.getResources(), R.drawable.r);
+//        bitmapChars[18] = BitmapFactory.decodeResource(context.getResources(), R.drawable.s);
+//        bitmapChars[19] = BitmapFactory.decodeResource(context.getResources(), R.drawable.t);
+//        bitmapChars[20] = BitmapFactory.decodeResource(context.getResources(), R.drawable.u);
+//        bitmapChars[21] = BitmapFactory.decodeResource(context.getResources(), R.drawable.v);
+//        bitmapChars[22] = BitmapFactory.decodeResource(context.getResources(), R.drawable.w);
+//        bitmapChars[23] = BitmapFactory.decodeResource(context.getResources(), R.drawable.x);
+//        bitmapChars[24] = BitmapFactory.decodeResource(context.getResources(), R.drawable.y);
+//        bitmapChars[25] = BitmapFactory.decodeResource(context.getResources(), R.drawable.z);
         // 对奶牛朝向右的图片做镜像变换得到朝左的图片
         Matrix localMatrix = new Matrix();
         localMatrix.setScale(-1, 1);

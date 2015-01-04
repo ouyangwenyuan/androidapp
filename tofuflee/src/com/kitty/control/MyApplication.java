@@ -2,6 +2,7 @@ package com.kitty.control;
 
 import android.app.Application;
 
+import com.kitty.global.ImageManager;
 import com.kitty.utils.AudioUtil;
 import com.kitty.utils.MediaPlayerUtil;
 
@@ -19,5 +20,7 @@ public class MyApplication extends Application {
         app = this;
         AudioUtil.init(this);
         MediaPlayerUtil.init(this);
+        ImageManager.getInstance();
+        ImageManager.getInstance().setContext(this);
     }
 }
