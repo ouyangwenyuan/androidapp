@@ -286,14 +286,18 @@ public class GameThread extends Thread {
                 gameMap.move();
                 if (null != tofu) {
                     //tofu移动
-                    tofu.move();
+                    tofu.move(1 / 60);
                 }
                 if (null != tofu) {
                     tofu.collideWidthMapObject();
                 }
                 break;
             //死亡
-            case GS_OVER:
+            case GS_OVER: {
+                if (tofu != null) {
+                    tofu.setY(tofu.getY() + screenHeight);
+                }
+            }
 
                 break;
             default:
@@ -381,7 +385,11 @@ public class GameThread extends Thread {
                         }
                     }
                     break;
-                case GS_OVER:
+                case GS_OVER: {
+                    canvas.drawBitmap(ImageManager.getInstance().bitmapLoading, screenWidth / 2 - (ImageManager.getInstance().bitmapLoading.getWidth() / 2), screenHeight / 2,
+                            paint);
+                    ImageManager.getInstance().bitmapWaterbg = Bitmap.createScaledBitmap(ImageManager.getInstance().bitmapWaterbg, screenWidth, screenHeight, false);
+                }
 
                 default:
             }

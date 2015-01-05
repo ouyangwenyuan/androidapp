@@ -48,12 +48,13 @@ public class Tofu {
     // 当前的弹跳状态
     private int jumpState;
     private int collideResult;
+    private boolean isLookLeft = false;
     // 向左
-    public static final int DIRECTION_LEFT = 0;
+    //public static final int DIRECTION_LEFT = 0;
     // 向右
-    public static final int DIRECTION_RIGHT = 1;
+    //public static final int DIRECTION_RIGHT = 1;
     // 当前的方向
-    private int direction;
+    // private int direction;
     // 线程类
     private GameThread gameThread;
     // 是否改变方向
@@ -71,14 +72,18 @@ public class Tofu {
     private int y;
     // 起跳高度
     private int jumpStartY;
-
+    //    private float x_pos = 160;
+    //    private float y_pos = 160;
+    private float x_speed = 0;
+    private float y_speed = 0;
+    private float y_acc = -800;
     // 上次由于移动产生的Y
     private int lastMoveY;
     private float xOffset;
 
     // 构造方法
     public Tofu() {
-        this.direction = DIRECTION_RIGHT;
+        //this.direction = DIRECTION_RIGHT;
         //this.gameThread = gameThread;
         this.gameThread = GameThread.getInstance();
         this.isDown = false;
@@ -130,67 +135,6 @@ public class Tofu {
         return isDown;
     }
 
-    /**
-     * 是否移动
-     * 
-     * @return
-     */
-    //      public void isMove() {
-    //            if (!isMove) {
-    //                return;
-    //            }
-    //            lastMoveY = y;
-    //    
-    //            int verSpeed = (jumpState == JUMP_STATE_MOVESLOWLY) ? MOVE_SPEED_VER_SLOW : MOVE_SPEED_VER_NORMAL;
-    //            // 垂直方向移动
-    //            if (isDown) {
-    //                y -= verSpeed;
-    //            }
-    //            // 第一屏不会死亡
-    //            if (map.getCurBottom() == 0) {
-    //                if (y - bitmapHeight < map.getCurBottom()) {
-    //                    y = bitmapHeight;
-    //                    isDown = false;
-    //                    jumpStartY = 0;
-    //                }
-    //            } else if (checkDead()) {
-    //                die();
-    //                Log.v(TAG, "the cow is dead!");
-    //    
-    //            } else {
-    //                // 上升的上限高度
-    //                int moveheightLimit = (jumpState == JUMP_STATE_HIGHJUMP || jumpState == JUMP_STATE_HIGHJUMP_ONCE) ? jumpHeightHigh : jumpHeightNormal;
-    //    
-    //                int oldY = y;
-    //                // 如果达到上限高度则下落
-    //                if (y + verSpeed - jumpStartY - bitmapHeight > moveheightLimit) {
-    //                    y = jumpStartY + bitmapHeight + moveheightLimit;
-    //                    isDown = true;
-    //                } else {
-    //                    y += verSpeed;
-    //                }
-    //                gameThread.updateCurheight(y);
-    //                // 拉动地图上升
-    //                gameThread.moveMap(oldY, y);
-    //            }
-    //            // 水平方向移动
-    //            if (isChangeDirection) {
-    //                switch (direction) {
-    //                    case DIRECTION_LEFT:
-    //                        x -= MOVE_SPPED_HOR_NORMAL * xOffset;
-    //                        if (x + bitmapWidth < 0) {
-    //                            x += GameThread.screenWidth;
-    //                        }
-    //                        break;
-    //                    case DIRECTION_RIGHT:
-    //                        x += MOVE_SPPED_HOR_NORMAL * xOffset;
-    //                        if (x > GameThread.screenWidth) {
-    //                            x -= GameThread.screenWidth;
-    //                        }
-    //                    default:
-    //                }
-    //            }
-    //        }
 
     /**
      * 绘制tofu
@@ -202,34 +146,34 @@ public class Tofu {
     public void draw(Canvas canvas, Paint paint, int paramInt) {
         int i = map.getCurBottom() + GameThread.screenHeight - y;
         canvas.save();
-        switch (direction) {
-            case DIRECTION_LEFT:
-                // 改变方向
-                if (isChangeDirection) {
-                    // 改变方向移动时，为图片添加旋转角度
-                    //canvas.rotate(-5, x, i);
-                }
-                // 下落
-                if (isDown) {
-                    canvas.drawBitmap(ImageManager.getInstance().bitmapLeftCow0, x, i, paint);
-                }
-                // 上升
-                else {
-                    canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow1, x, i, paint);
-                }
-                break;
-            case DIRECTION_RIGHT:
+        //        switch (isLookLeft) {
+        //            case DIRECTION_LEFT:
+        // 改变方向
+        if (isLookLeft) {
+            if (isChangeDirection) {
                 // 改变方向移动时，为图片添加旋转角度
-                if (isChangeDirection) {
-                    //canvas.rotate(5, x + bitmapWidth, i);
-                }
-                if (isDown) {
-                    canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow0, x, i, paint);
-                } else {
-                    canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow1, x, i, paint);
-                }
-                break;
-            default:
+                //canvas.rotate(-5, x, i);
+            }
+            // 下落
+            if (isDown) {
+                canvas.drawBitmap(ImageManager.getInstance().bitmapLeftCow0, x, i, paint);
+            }
+            // 上升
+            else {
+                canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow1, x, i, paint);
+            }
+        } else {
+
+            // 改变方向移动时，为图片添加旋转角度
+            if (isChangeDirection) {
+                //canvas.rotate(5, x + bitmapWidth, i);
+            }
+            if (isDown) {
+                canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow0, x, i, paint);
+            } else {
+                canvas.drawBitmap(ImageManager.getInstance().bitmapRightCow1, x, i, paint);
+            }
+
         }
         canvas.restore();
         if (null != curBonus) {
@@ -471,7 +415,8 @@ public class Tofu {
     public void changDirectionLeft(float xOffset) {
         this.xOffset = xOffset;
         isChangeDirection = true;
-        direction = DIRECTION_LEFT;
+        //direction = DIRECTION_LEFT;
+        isLookLeft = true;
     }
 
     /**
@@ -480,7 +425,8 @@ public class Tofu {
     public void changDirectionRight(float xOffset) {
         this.xOffset = xOffset;
         isChangeDirection = true;
-        direction = DIRECTION_RIGHT;
+        //direction = DIRECTION_RIGHT;
+        isLookLeft = false;
     }
 
     /**
@@ -493,7 +439,7 @@ public class Tofu {
     /**
      * tofu移动
      */
-    public void move() {
+    public void move(float d) {
         if (!isMove) {
             return;
         }
@@ -536,19 +482,18 @@ public class Tofu {
         }
         // 水平方向移动
         if (isChangeDirection) {
-            switch (direction) {
-                case DIRECTION_LEFT:
-                    x -= MOVE_SPPED_HOR_NORMAL * xOffset;
-                    if (x + bitmapWidth < 0) {
-                        x += GameThread.screenWidth;
-                    }
-                    break;
-                case DIRECTION_RIGHT:
-                    x += MOVE_SPPED_HOR_NORMAL * xOffset;
-                    if (x > GameThread.screenWidth) {
-                        x -= GameThread.screenWidth;
-                    }
-                default:
+            //            switch (direction) {
+            //                case DIRECTION_LEFT:
+            if (isLookLeft) {
+                x -= MOVE_SPPED_HOR_NORMAL * xOffset;
+                if (x + bitmapWidth < 0) {
+                    x += GameThread.screenWidth;
+                }
+            } else {
+                x += MOVE_SPPED_HOR_NORMAL * xOffset;
+                if (x > GameThread.screenWidth) {
+                    x -= GameThread.screenWidth;
+                }
             }
         }
     }

@@ -35,7 +35,6 @@ public class SecondLayer extends CCLayer {
     private float y_pos = 160;
     private float x_speed = 0;
     private float y_speed = 0;
-
     private float y_acc = -800;
 
     private CCSprite tofu;
