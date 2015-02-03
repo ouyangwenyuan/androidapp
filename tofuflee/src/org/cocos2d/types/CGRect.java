@@ -179,7 +179,7 @@ public class CGRect {
         return (!(aRect.size.width > 0 && aRect.size.height > 0));
     }
 
-    public enum Edge {
+    public static enum Edge {
         MinXEdge,
         MinYEdge,
         MaxXEdge,

@@ -3,14 +3,17 @@ package com.kitty.model;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.cocos2d.sound.SoundEngine;
+
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.util.Log;
 import android.view.KeyEvent;
 
+import com.kitty.control.MyApplication;
 import com.kitty.global.ImageManager;
-import com.kitty.utils.AudioUtil;
+import com.kitty.tofuflee.R;
 import com.kitty.view.GameThread;
 
 public class Tofu {
@@ -181,9 +184,9 @@ public class Tofu {
         }
     }
 
-    public void collideWidthMapObject() {
+    public void collideWidthPlateModel() {
         // 对两屏可见的地图物体进行碰撞检测
-        if ((collideWidthMapObjects(map.getObjectList1()) > COLLIDE_RESULT_CONTIONUE) || (collideWidthMapObjects(map.getObjectList2()) > COLLIDE_RESULT_CONTIONUE)) {
+        if ((collideWidthPlateModels(map.getObjectList1()) > COLLIDE_RESULT_CONTIONUE) || (collideWidthPlateModels(map.getObjectList2()) > COLLIDE_RESULT_CONTIONUE)) {
             if (collideResult == COLLIDE_RESULT_LOSE) {
                 // 死亡
                 die();
@@ -200,25 +203,25 @@ public class Tofu {
      * @param objectList地图物体
      * @return 碰撞结果
      */
-    private int collideWidthMapObjects(ArrayList<MapObject> objectList) {
-        ArrayList<MapObject> toRemovePresents = new ArrayList<MapObject>();
+    private int collideWidthPlateModels(ArrayList<PlateModel> objectList) {
+        ArrayList<PlateModel> toRemovePresents = new ArrayList<PlateModel>();
 
         // 检测对于黑洞、炸弹、礼物盒的碰撞
-        for (MapObject obj : objectList) {
-            if (obj.isVisibleInScreen(map.getCurBottom()) && this.intersectMapObject(obj)) {
+        for (PlateModel obj : objectList) {
+            if (obj.isVisibleInScreen(map.getCurBottom()) && this.intersectPlateModel(obj)) {
                 switch (obj.getType()) {
                 // 黑洞
-                    case MapObject.TYPE_AST:
+                    case PlateModel.TYPE_AST:
                         isMove = false;
                         collideResult = COLLIDE_RESULT_LOSE;
                         return collideResult;
                         // 炸弹
-                    case MapObject.TYPE_BOME:
+                    case PlateModel.TYPE_BOME:
                         isMove = false;
                         objectList.remove(obj);
                         collideResult = COLLIDE_RESULT_LOSE;
                         return collideResult;
-                    case MapObject.TYPE_PRESENT:
+                    case PlateModel.TYPE_PRESENT:
                         // tofu与礼物盒碰撞
                         collideWidthPresent();
                         toRemovePresents.add(obj);
@@ -230,18 +233,18 @@ public class Tofu {
         // 删除礼物盒对象
         objectList.removeAll(toRemovePresents);
 
-        MapObject toRemocePas = null;
+        PlateModel toRemocePas = null;
         // tofu下落过程中检测对于踏板的碰撞
         if (isDown) {
-            for (MapObject obj : objectList) {
-                if (obj.isVisibleInScreen(map.getCurBottom()) && this.intersectMapObject(obj) && isHigherThanMapObject(obj)) {
+            for (PlateModel obj : objectList) {
+                if (obj.isVisibleInScreen(map.getCurBottom()) && this.intersectPlateModel(obj) && isHigherThanPlateModel(obj)) {
                     Log.i(this.getClass().getName(), "tofu踩到踏板！");
                     switch (obj.getType()) {
-                        case MapObject.TYPE_PAS_1:
-                        case MapObject.TYPE_PAS_2:
-                        case MapObject.TYPE_PAS_3:
-                        case MapObject.TYPE_PAS_4:
-                        case MapObject.TYPE_PAS_TRAMP:
+                        case PlateModel.TYPE_PAS_1:
+                        case PlateModel.TYPE_PAS_2:
+                        case PlateModel.TYPE_PAS_3:
+                        case PlateModel.TYPE_PAS_4:
+                        case PlateModel.TYPE_PAS_TRAMP:
                             // 发生弹跳事件，tofu移动方向改为上升
                             isDown = false;
                             // tofu的当前Y坐标
@@ -254,13 +257,14 @@ public class Tofu {
                             }
                             playJumpSound();
                             updateCurBonus();
-                            if (obj.getType() == MapObject.TYPE_PAS_TRAMP) {
+                            if (obj.getType() == PlateModel.TYPE_PAS_TRAMP) {
                                 y = obj.getY() + bitmapHeight;
                                 jumpState = JUMP_STATE_HIGHJUMP_ONCE;
-                                AudioUtil.getAudioUtil().play(AudioManager.STREAM_MUSIC, 1);
+                                //AudioUtil.getAudioUtil().play(AudioManager.STREAM_MUSIC, 1);
+                                SoundEngine.sharedEngine().playEffect(MyApplication.getGlobalContext(), R.raw.highjump);
                             }
                             break;
-                        case MapObject.TYPE_PAS_GOAL:
+                        case PlateModel.TYPE_PAS_GOAL:
                             // tofu碰撞到终点踏板上缘时游戏胜利
                             if (y - bitmapHeight <= obj.getPasTopY()) {
                                 // tofu当前Y坐标
@@ -319,10 +323,12 @@ public class Tofu {
     private void playJumpSound() {
         switch (jumpState) {
             case JUMP_STATE_HIGHJUMP:
-                AudioUtil.getAudioUtil().play(AudioUtil.SOUND_HIJUMP, 0);
+                //AudioUtil.getAudioUtil().play(AudioUtil.SOUND_HIJUMP, 0);
+                SoundEngine.sharedEngine().playEffect(MyApplication.getGlobalContext(), R.raw.highjump);
                 break;
             case JUMP_STATE_CRUMBLE:
-                AudioUtil.getAudioUtil().play(AudioUtil.SOUND_CRUMBLE, 0);
+                //AudioUtil.getAudioUtil().play(AudioUtil.SOUND_CRUMBLE, 0);
+                SoundEngine.sharedEngine().playEffect(MyApplication.getGlobalContext(), R.raw.highjump);
             default:
         }
     }
@@ -353,7 +359,7 @@ public class Tofu {
      * @param obj
      * @return
      */
-    private boolean isHigherThanMapObject(MapObject obj) {
+    private boolean isHigherThanPlateModel(PlateModel obj) {
         return lastMoveY - bitmapHeight > obj.getPasTopY();
     }
 
@@ -368,7 +374,7 @@ public class Tofu {
      * @param obj
      * @return
      */
-    private boolean intersectMapObject(MapObject obj) {
+    private boolean intersectPlateModel(PlateModel obj) {
         return (obj.getX() < x + bitmapWidth) && (obj.getY() - obj.getBitmap().getHeight() < y) && (obj.getX() + obj.getBitmap().getWidth() > x) && (obj.getY() > y - bitmapHeight);
     }
 
@@ -377,7 +383,8 @@ public class Tofu {
      */
     private void win() {
         isMove = false;
-        AudioUtil.getAudioUtil().play(AudioUtil.SOUND_FANFARE, 1);
+        //AudioUtil.getAudioUtil().play(AudioUtil.SOUND_FANFARE, 1);
+        SoundEngine.sharedEngine().playEffect(MyApplication.getGlobalContext(), R.raw.win);
         gameThread.gameWin();
     }
 
@@ -385,7 +392,8 @@ public class Tofu {
      * tofu死亡
      */
     private void die() {
-        AudioUtil.getAudioUtil().play(AudioUtil.SOUND_LOSE, 0);
+        //AudioUtil.getAudioUtil().play(AudioUtil.SOUND_LOSE, 0);
+        SoundEngine.sharedEngine().playEffect(MyApplication.getGlobalContext(), R.raw.lomise);
         gameThread.gameOver();
     }
 

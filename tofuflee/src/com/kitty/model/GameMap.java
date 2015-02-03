@@ -39,9 +39,9 @@ public class GameMap {
     // 已产生礼物盒的数量
     private int presentNum = 0;
     // 第一屏地图物体的集合
-    public ArrayList<MapObject> objectList1 = new ArrayList<MapObject>();
+    public ArrayList<PlateModel> objectList1 = new ArrayList<PlateModel>();
     // 第二屏地图物体的集合
-    public ArrayList<MapObject> objectList2 = new ArrayList<MapObject>();
+    public ArrayList<PlateModel> objectList2 = new ArrayList<PlateModel>();
     // 当前地图底部的坐标
     private int curBottom;
     // 已初始化数据的屏数
@@ -79,14 +79,14 @@ public class GameMap {
         }
         // 对于第一屏的物体，移动Y坐标大于地图底部坐标的
         for (int i = 0; i < objectList1.size(); i++) {
-            MapObject obj = objectList1.get(i);
+            PlateModel obj = objectList1.get(i);
             if (obj.getY() > curBottom) {
                 obj.move();
             }
         }
         // 对于第二屏的物体，移动Y坐标小于地图底部坐标加上屏幕高度的
         for (int i = 0; i < objectList2.size(); i++) {
-            MapObject obj = objectList2.get(i);
+            PlateModel obj = objectList2.get(i);
             if (obj.getY() > GameThread.screenHeight) {
                 obj.move();
             }
@@ -112,19 +112,19 @@ public class GameMap {
             // 将游戏中的第二屏复制给第一屏
             objectList1 = objectList2;
             // 初始化第二屏的数据
-            objectList2 = new ArrayList<MapObject>();
+            objectList2 = new ArrayList<PlateModel>();
             for (int i = initialScreenNum * GameThread.screenHeight + LINE_HEIGHT; i < (initialScreenNum + 1) * GameThread.screenHeight; i += LINE_HEIGHT) {
                 if (i >= MAX_HEIGHT) {
                     if (i - lastPasCreatedHeight >= Tofu.jumpHeightHigh) {
                         int tempHeight = lastPasCreatedHeight + Tofu.jumpHeightNormal - LINE_HEIGHT;
                         if (tempHeight < MAX_HEIGHT) {
-                            MapObject obj = createRealNormalPas(tempHeight);
+                            PlateModel obj = createRealNormalPas(tempHeight);
                             lastPasCreatedHeight = obj.getY() > lastPasCreatedHeight ? obj.getY() : lastPasCreatedHeight;
                             objectList2.add(obj);
                         }
                     }
                     // 产生终点踏板
-                    objectList2.add(new MapObject(MapObject.TYPE_PAS_GOAL, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPasGoal.getWidth()), MAX_HEIGHT
+                    objectList2.add(new PlateModel(PlateModel.TYPE_PAS_GOAL, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPasGoal.getWidth()), MAX_HEIGHT
                             + GameThread.screenWidth - ImageManager.getInstance().bitmapPasGoal.getHeight() - ImageManager.getInstance().bitmapPas4.getHeight(), false));
                     break;
                 } else {
@@ -153,30 +153,30 @@ public class GameMap {
      * @param height 出现位置的高度
      * @return 产生的地图物体
      */
-    private ArrayList<MapObject> createRandomMapObjects(int height) {
-        ArrayList<MapObject> objList = new ArrayList<MapObject>();
+    private ArrayList<PlateModel> createRandomMapObjects(int height) {
+        ArrayList<PlateModel> objList = new ArrayList<PlateModel>();
         // 黑洞
-        MapObject ast = createAst(height);
+        PlateModel ast = createAst(height);
         if (ast != null) {
             objList.add(ast);
         }
         // 踏板
-        MapObject normalPas = createNormalpas(height);
+        PlateModel normalPas = createNormalpas(height);
         if (normalPas != null) {
             objList.add(normalPas);
         }
         // 弹簧踏板
-        MapObject trampPas = createTrampPas(height);
+        PlateModel trampPas = createTrampPas(height);
         if (trampPas != null) {
             objList.add(trampPas);
         }
         // 礼物盒
-        MapObject present = createPresent(height);
+        PlateModel present = createPresent(height);
         if (present != null) {
             objList.add(present);
         }
         // shit
-        MapObject bomb = createBomb(height);
+        PlateModel bomb = createBomb(height);
         if (bomb != null) {
             objList.add(bomb);
         }
@@ -189,9 +189,9 @@ public class GameMap {
      * @param paramInt
      * @return
      */
-    private MapObject createBomb(int paramInt) {
+    private PlateModel createBomb(int paramInt) {
         int i = GameThread.screenHeight;
-        MapObject localMapObject = null;
+        PlateModel localMapObject = null;
         if (paramInt > i) {
             int j = bombNum;
             localMapObject = null;
@@ -199,7 +199,7 @@ public class GameMap {
                 int k = random.nextInt(30);
                 localMapObject = null;
                 if (k == 0) {
-                    localMapObject = new MapObject(9, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapBomb.getWidth()), paramInt, true);
+                    localMapObject = new PlateModel(9, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapBomb.getWidth()), paramInt, true);
                     bombNum = 1 + bombNum;
                 }
             }
@@ -210,9 +210,9 @@ public class GameMap {
     /**
      * 创建弹簧踏板
      */
-    private MapObject createTrampPas(int paramInt) {
+    private PlateModel createTrampPas(int paramInt) {
         int i = GameThread.screenHeight;
-        MapObject localMapObject = null;
+        PlateModel localMapObject = null;
         if (paramInt > i) {
             int j = trampPasNum;
             localMapObject = null;
@@ -220,7 +220,7 @@ public class GameMap {
                 int k = random.nextInt(50);
                 localMapObject = null;
                 if (k == 0) {
-                    localMapObject = new MapObject(5, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPasTramp.getWidth()), paramInt, false);
+                    localMapObject = new PlateModel(5, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPasTramp.getWidth()), paramInt, false);
                     trampPasNum = 1 + trampPasNum;
                 }
             }
@@ -234,9 +234,9 @@ public class GameMap {
      * @param paramInt
      * @return
      */
-    private MapObject createPresent(int paramInt) {
+    private PlateModel createPresent(int paramInt) {
         int i = GameThread.screenHeight;
-        MapObject localMapObject = null;
+        PlateModel localMapObject = null;
         if (paramInt > i) {
             int j = presentNum;
             localMapObject = null;
@@ -244,7 +244,7 @@ public class GameMap {
                 int k = random.nextInt(30);
                 localMapObject = null;
                 if (k == 0) {
-                    localMapObject = new MapObject(7, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPresent.getWidth()), paramInt, false);
+                    localMapObject = new PlateModel(7, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPresent.getWidth()), paramInt, false);
                     presentNum = 1 + presentNum;
                 }
             }
@@ -258,8 +258,8 @@ public class GameMap {
      * @param paramInt
      * @return
      */
-    private MapObject createNormalpas(int height) {
-        MapObject obj = null;
+    private PlateModel createNormalpas(int height) {
+        PlateModel obj = null;
         // 如果当前的距离一个产生的高度已超过奶牛的跳跃的高度的画
         if (height - lastPasCreatedHeight >= Tofu.jumpHeightNormal) {
             obj = createRealNormalPas(lastPasCreatedHeight + curBottom);
@@ -275,16 +275,16 @@ public class GameMap {
      * @param height
      * @return
      */
-    private MapObject createRealNormalPas(int height) {
+    private PlateModel createRealNormalPas(int height) {
         final double sqrtHeight = Math.sqrt(height);
-        int type = random.nextInt(MapObject.TYPE_PAS_4) + 1;
+        int type = random.nextInt(PlateModel.TYPE_PAS_4) + 1;
         boolean isMove = false;
         // 两屏以上的踏板才可以移动
         int saveHeight = (int) sqrtHeight;
         if (random.nextInt((int) saveHeight >= 1 ? saveHeight : 1) > Math.sqrt(GameThread.screenHeight)) {
             isMove = true;
         }
-        return new MapObject(type, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPas1.getWidth()), height, isMove);
+        return new PlateModel(type, random.nextInt(GameThread.screenWidth - ImageManager.getInstance().bitmapPas1.getWidth()), height, isMove);
     }
 
     /**
@@ -293,14 +293,14 @@ public class GameMap {
      * @param height
      * @return
      */
-    private MapObject createAst(int height) {
-        MapObject obj = null;
+    private PlateModel createAst(int height) {
+        PlateModel obj = null;
 
         // 一屏以上的高度1/100几率产生黑洞
         if (height > GameThread.screenHeight) {
             if (astNum < MAX_AST_NUM) {
                 if (random.nextInt(100) == 0) {
-                    obj = new MapObject(MapObject.TYPE_AST, 0, height, false);
+                    obj = new PlateModel(PlateModel.TYPE_AST, 0, height, false);
                     astNum++;
                 }
             }
@@ -334,14 +334,14 @@ public class GameMap {
         }
         // 对于第一个物体的，画y坐标大雨地图的底部的坐标
         for (int i = 0; i < objectList1.size(); i++) {
-            MapObject obj = objectList1.get(i);
+            PlateModel obj = objectList1.get(i);
             if (obj.isVisibleInScreen(curBottom)) {
                 obj.draw(canvas, paint, frame, curBottom);
             }
         }
         // 对于第二屏的物体，画y坐标的地图底部要加上屏幕的高度
         for (int i = 0; i < objectList2.size(); i++) {
-            MapObject obj = objectList2.get(i);
+            PlateModel obj = objectList2.get(i);
             if (obj.isVisibleInScreen(curBottom)) {
                 obj.draw(canvas, paint, frame, curBottom);
             }
@@ -381,11 +381,11 @@ public class GameMap {
         this.initialScreenNum = initialScreenNum;
     }
 
-    public ArrayList<MapObject> getObjectList1() {
+    public ArrayList<PlateModel> getObjectList1() {
         return objectList1;
     }
 
-    public ArrayList<MapObject> getObjectList2() {
+    public ArrayList<PlateModel> getObjectList2() {
         return objectList2;
     }
 

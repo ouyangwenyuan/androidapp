@@ -3,6 +3,8 @@ package com.kitty.view;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.cocos2d.sound.SoundEngine;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,7 +27,6 @@ import com.kitty.model.GameMap;
 import com.kitty.model.Tofu;
 import com.kitty.tofuflee.R;
 import com.kitty.utils.CrumbleAnimation;
-import com.kitty.utils.MediaPlayerUtil;
 
 public class GameThread extends Thread {
 
@@ -89,7 +90,7 @@ public class GameThread extends Thread {
     //地图类
     private GameMap gameMap;
     //音乐处理类
-    private MediaPlayerUtil mpu;
+  //  private MediaPlayerUtil mpu;
     //实例化一个画笔
     private Paint paint = new Paint();
     private boolean hasInitFinish;
@@ -102,8 +103,8 @@ public class GameThread extends Thread {
         // this.handler = handler;
         this.context = context;
         this.surfaceHolder = holder;
-        this.mpu = MediaPlayerUtil.getMediaPlayerUtil();
-        mpu.setMediaRes(R.raw.abd_mus1);
+       // this.mpu = MediaPlayerUtil.getMediaPlayerUtil();
+       // mpu.setMediaRes(R.raw.abd_mus1);
         instance = this;
     }
 
@@ -137,7 +138,8 @@ public class GameThread extends Thread {
     public void pause() {
         synchronized (surfaceHolder) {
             isPaused = true;
-            mpu.pause();
+            //mpu.pause();
+            SoundEngine.sharedEngine().pauseSound();
         }
     }
 
@@ -148,7 +150,8 @@ public class GameThread extends Thread {
         // 如果游戏中存在时间，需要将其在此调整到正常
         synchronized (surfaceHolder) {
             isPaused = false;
-            mpu.resume();
+//            mpu.resume();
+            SoundEngine.sharedEngine().resumeSound();
         }
     }
 
@@ -289,7 +292,7 @@ public class GameThread extends Thread {
                     tofu.move(1 / 60);
                 }
                 if (null != tofu) {
-                    tofu.collideWidthMapObject();
+                    tofu.collideWidthPlateModel();
                 }
                 break;
             //死亡
@@ -468,7 +471,8 @@ public class GameThread extends Thread {
                             gameState = GS_START;
                             tofu.setMove(true);
                             hasPressedStart = false;
-                            mpu.play();
+                            //mpu.play();
+                           // SoundEngine.sharedEngine().playSound(context, R.raw.abd_mus1, true);
                         }
                     }, 200);
                 }
@@ -496,7 +500,11 @@ public class GameThread extends Thread {
         bundle.putString("text", starState);
         msg.setData(bundle);
         //handler.sendMessage(msg);
-        mpu.stop();
+       // mpu.stop();
+        //SoundEngine.sharedEngine().realesSound(R.raw.abd_mus1);
+        SoundEngine.sharedEngine().pauseSound();
+        SoundEngine.sharedEngine().stopSound();
+        SoundEngine.sharedEngine().realesAllSounds();
         new Timer().schedule(new TimerTask() {
 
             @Override
@@ -519,7 +527,10 @@ public class GameThread extends Thread {
         bundle.putString("text", starState);
         msg.setData(bundle);
         //handler.sendMessage(msg);
-        mpu.stop();
+       // mpu.stop();
+        SoundEngine.sharedEngine().pauseSound();
+        //SoundEngine.sharedEngine().stopSound();
+        SoundEngine.sharedEngine().realesAllSounds();
         new Timer().schedule(new TimerTask() {
 
             @Override
